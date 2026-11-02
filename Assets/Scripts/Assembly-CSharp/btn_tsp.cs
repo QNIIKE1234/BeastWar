@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class btn_tsp : MonoBehaviour, IPointerDownHandler, IEventSystemHandler
 {
@@ -19,83 +20,122 @@ public class btn_tsp : MonoBehaviour, IPointerDownHandler, IEventSystemHandler
 
 	private void Start()
 	{
-		takeoff_btn = GameObject.Find("takeoff").GetComponent<takeoff_tsp>();
-		snow.SetActive(value: false);
-		beach.SetActive(value: false);
-		eyp.SetActive(value: false);
-		cave.SetActive(value: false);
-		forest.SetActive(value: false);
+		GameObject toObj = GameObject.Find("takeoff");
+		if (toObj != null) takeoff_btn = toObj.GetComponent<takeoff_tsp>();
+
+		if (snow != null) snow.SetActive(value: false);
+		if (beach != null) beach.SetActive(value: false);
+		if (eyp != null) eyp.SetActive(value: false);
+		if (cave != null) cave.SetActive(value: false);
+		if (forest != null) forest.SetActive(value: false);
+
+		Button btn = GetComponent<Button>();
+		if (btn != null)
+		{
+			btn.onClick.RemoveListener(ExecuteClick);
+			btn.onClick.AddListener(ExecuteClick);
+		}
+	}
+
+	public void ExecuteClick()
+	{
+		OnPointerDown(null);
 	}
 
 	public void OnPointerDown(PointerEventData eventData)
 	{
-		if (R_L == "R")
+		if (takeoff_btn == null)
 		{
-			takeoff_btn.numtown++;
+			GameObject toObj = GameObject.Find("takeoff");
+			if (toObj != null) takeoff_btn = toObj.GetComponent<takeoff_tsp>();
 		}
-		else if (R_L == "L")
+
+		if (takeoff_btn != null)
 		{
-			takeoff_btn.numtown--;
+			if (R_L == "R")
+			{
+				takeoff_btn.numtown++;
+			}
+			else if (R_L == "L")
+			{
+				takeoff_btn.numtown--;
+			}
 		}
-		else if (R_L == "esc")
+
+		if (R_L == "esc")
 		{
-			Object.Destroy(GameObject.Find("TransportGui(Clone)"));
-			PilotMole_NPC component = GameObject.Find("PilotMole").GetComponent<PilotMole_NPC>();
-			component.gamegui.SetActive(value: true);
-			component.isclicked = false;
+			GameObject tspClone = GameObject.Find("TransportGui(Clone)");
+			if (tspClone != null) Object.Destroy(tspClone);
+
+			GameObject pmObj = GameObject.Find("PilotMole");
+			if (pmObj != null)
+			{
+				PilotMole_NPC component = pmObj.GetComponent<PilotMole_NPC>();
+				if (component != null)
+				{
+					if (component.gamegui != null) component.gamegui.SetActive(value: true);
+					component.isclicked = false;
+				}
+			}
 		}
-		Debug.Log(takeoff_btn.numtown);
+
+		if (takeoff_btn != null)
+		{
+			Debug.Log(takeoff_btn.numtown);
+		}
 	}
 
 	public void ticket_show()
 	{
+		if (takeoff_btn == null) return;
+
 		if (takeoff_btn.numtown == 1)
 		{
-			snow.SetActive(value: false);
-			beach.SetActive(value: false);
-			eyp.SetActive(value: false);
-			cave.SetActive(value: false);
-			forest.SetActive(value: false);
+			if (snow != null) snow.SetActive(value: false);
+			if (beach != null) beach.SetActive(value: false);
+			if (eyp != null) eyp.SetActive(value: false);
+			if (cave != null) cave.SetActive(value: false);
+			if (forest != null) forest.SetActive(value: false);
 		}
 		else if (takeoff_btn.numtown == 2)
 		{
-			snow.SetActive(value: true);
-			beach.SetActive(value: false);
-			eyp.SetActive(value: false);
-			cave.SetActive(value: false);
-			forest.SetActive(value: false);
+			if (snow != null) snow.SetActive(value: true);
+			if (beach != null) beach.SetActive(value: false);
+			if (eyp != null) eyp.SetActive(value: false);
+			if (cave != null) cave.SetActive(value: false);
+			if (forest != null) forest.SetActive(value: false);
 		}
 		else if (takeoff_btn.numtown == 3)
 		{
-			snow.SetActive(value: false);
-			beach.SetActive(value: true);
-			eyp.SetActive(value: false);
-			cave.SetActive(value: false);
-			forest.SetActive(value: false);
+			if (snow != null) snow.SetActive(value: false);
+			if (beach != null) beach.SetActive(value: true);
+			if (eyp != null) eyp.SetActive(value: false);
+			if (cave != null) cave.SetActive(value: false);
+			if (forest != null) forest.SetActive(value: false);
 		}
 		else if (takeoff_btn.numtown == 4)
 		{
-			snow.SetActive(value: true);
-			beach.SetActive(value: false);
-			eyp.SetActive(value: true);
-			cave.SetActive(value: false);
-			forest.SetActive(value: false);
+			if (snow != null) snow.SetActive(value: true);
+			if (beach != null) beach.SetActive(value: false);
+			if (eyp != null) eyp.SetActive(value: true);
+			if (cave != null) cave.SetActive(value: false);
+			if (forest != null) forest.SetActive(value: false);
 		}
 		else if (takeoff_btn.numtown == 5)
 		{
-			snow.SetActive(value: true);
-			beach.SetActive(value: false);
-			eyp.SetActive(value: false);
-			cave.SetActive(value: true);
-			forest.SetActive(value: false);
+			if (snow != null) snow.SetActive(value: true);
+			if (beach != null) beach.SetActive(value: false);
+			if (eyp != null) eyp.SetActive(value: false);
+			if (cave != null) cave.SetActive(value: true);
+			if (forest != null) forest.SetActive(value: false);
 		}
 		else if (takeoff_btn.numtown == 6)
 		{
-			snow.SetActive(value: true);
-			beach.SetActive(value: false);
-			eyp.SetActive(value: false);
-			cave.SetActive(value: false);
-			forest.SetActive(value: true);
+			if (snow != null) snow.SetActive(value: true);
+			if (beach != null) beach.SetActive(value: false);
+			if (eyp != null) eyp.SetActive(value: false);
+			if (cave != null) cave.SetActive(value: false);
+			if (forest != null) forest.SetActive(value: true);
 		}
 	}
 }
