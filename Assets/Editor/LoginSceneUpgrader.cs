@@ -11,22 +11,29 @@ using UnityEngine.UI;
 public static class LoginSceneUpgrader
 {
     private const string ScenePath = "Assets/Scene/Scene/A01_SecureLogin.unity";
+    private static int updateTicks = 0;
 
     static LoginSceneUpgrader()
     {
-        EditorApplication.delayCall += AutoUpgradeIfNeeded;
+        updateTicks = 0;
+        EditorApplication.update += AutoCheckLoop;
     }
 
     [InitializeOnLoadMethod]
     private static void OnEditorLoad()
     {
-        EditorApplication.delayCall += AutoUpgradeIfNeeded;
+        updateTicks = 0;
+        EditorApplication.update += AutoCheckLoop;
     }
 
-    private static void AutoUpgradeIfNeeded()
+    private static void AutoCheckLoop()
     {
+        updateTicks++;
+        // Give the editor 5 ticks to ensure scene objects are loaded
+        if (updateTicks < 5) return;
+
         Scene currentScene = EditorSceneManager.GetActiveScene();
-        if (currentScene.IsValid() && (currentScene.path == ScenePath || currentScene.name == "A01_SecureLogin"))
+        if (currentScene.IsValid() && (currentScene.name == "A01_SecureLogin" || currentScene.path == ScenePath))
         {
             GameObject userNameObj = GameObject.Find("User_Name");
             if (userNameObj != null)
@@ -37,10 +44,16 @@ public static class LoginSceneUpgrader
 
                 if (hasLegacy)
                 {
-                    Debug.Log("[LoginSceneUpgrader] Legacy UI components detected in A01_SecureLogin. Auto-upgrading to TextMeshPro...");
+                    Debug.Log("[LoginSceneUpgrader] Legacy UI detected in A01_SecureLogin! Auto-executing upgrade to TextMeshPro now...");
                     ExecuteUpgrade(false);
                 }
             }
+        }
+
+        // Stop checking once executed or past initial load
+        if (updateTicks > 30)
+        {
+            EditorApplication.update -= AutoCheckLoop;
         }
     }
 
@@ -53,7 +66,7 @@ public static class LoginSceneUpgrader
     public static void ExecuteUpgrade(bool showDialog)
     {
         Scene currentScene = EditorSceneManager.GetActiveScene();
-        if (currentScene.path != ScenePath && currentScene.name != "A01_SecureLogin")
+        if (currentScene.name != "A01_SecureLogin" && currentScene.path != ScenePath)
         {
             currentScene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
             if (!currentScene.IsValid())
@@ -113,6 +126,7 @@ public static class LoginSceneUpgrader
             }
 
             loginManager.loginButton = btn;
+            EditorUtility.SetDirty(loginButtonObj);
         }
 
         // 3. Upgrade User_Name to TMPro
@@ -146,7 +160,10 @@ public static class LoginSceneUpgrader
                 }
                 es.gameObject.AddComponent<InputSystemUIInputModule>();
             }
+            EditorUtility.SetDirty(es.gameObject);
         }
+
+        EditorUtility.SetDirty(loginManagerObj);
 
         // Mark scene dirty and save
         EditorSceneManager.MarkSceneDirty(currentScene);
@@ -156,7 +173,7 @@ public static class LoginSceneUpgrader
         if (showDialog)
         {
             EditorUtility.DisplayDialog("12 Tails Modern UI",
-                "Login Scene upgraded to Modern TextMeshPro!\n\n" +
+                "Login Scene upgraded to Modern TextMeshPro successfully!\n\n" +
                 "- User_Name: Converted to TMP_InputField & TextMeshProUGUI\n" +
                 "- Password: Converted to TMP_InputField & TextMeshProUGUI\n" +
                 "- Login_h: Converted to standard Button\n" +
@@ -212,6 +229,7 @@ public static class LoginSceneUpgrader
             tmpText.text = txt;
             tmpText.alignment = TextAlignmentOptions.MidlineLeft;
             tmpText.raycastTarget = false;
+            EditorUtility.SetDirty(textChild.gameObject);
         }
 
         // 3. Handle Placeholder child
@@ -245,6 +263,7 @@ public static class LoginSceneUpgrader
             tmpPlaceholder.fontStyle = FontStyles.Italic;
             tmpPlaceholder.alignment = TextAlignmentOptions.MidlineLeft;
             tmpPlaceholder.raycastTarget = false;
+            EditorUtility.SetDirty(placeholderChild.gameObject);
         }
 
         // 4. Add or configure TMP_InputField
@@ -274,6 +293,7 @@ public static class LoginSceneUpgrader
             graphic.raycastTarget = true;
         }
 
+        EditorUtility.SetDirty(inputRoot);
         return tmpInputField;
     }
 }
